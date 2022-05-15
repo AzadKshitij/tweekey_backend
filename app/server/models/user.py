@@ -33,14 +33,13 @@ class UserLoginSchema(BaseModel):
 
 class UpdateUserModel(BaseModel):
     fullname: Optional[str]
-    email: Optional[EmailStr]
+    # email: Optional[EmailStr]
     password: Optional[str]
 
     class Config:
         schema_extra = {
             "example": {
                 "fullname": "John Doe",
-                "email": "jdoe@x.edu.ng",
                 "password": "password",
             }
         }

@@ -1,4 +1,5 @@
 from typing import List
+from bson.objectid import ObjectId
 
 from .database import database
 
@@ -47,14 +48,14 @@ async def retrieve_user(email: str) -> dict:
 
 
 # Update a user with a matching ID
-async def update_user(email: str, data: dict):
+async def update_user(id: str, data: dict):
     # Return false if an empty request body is sent.
     if len(data) < 1:
         return False
-    user = await user_collection.find_one({"email": email})
+    user = await user_collection.find_one({"_id": ObjectId(id)})
     if user:
         updated_user = await user_collection.update_one(
-            {"email": email}, {"$set": data}
+            {"_id": ObjectId(id)}, {"$set": data}
         )
         if updated_user:
             return True
@@ -62,8 +63,8 @@ async def update_user(email: str, data: dict):
 
 
 # Delete a user from the database
-async def delete_user(email: str):
-    user = await user_collection.find_one({"email": email})
+async def delete_user(id: str):
+    user = await user_collection.find_one({"_id": ObjectId(id)})
     if user:
-        await user_collection.delete_one({"email": email})
+        await user_collection.delete_one({"_id": ObjectId(id)})
         return True

@@ -5,6 +5,7 @@ from .database import database
 
 
 todo_collection = database.get_collection("todos_collection")
+user_collection = database.get_collection("users_collection")
 
 
 # helpers
@@ -31,11 +32,16 @@ async def retrieve_todos(user_id: str) -> List[dict]:
 
 # Add a new todo into to the database
 async def add_todo(todo_data: dict) -> dict:
-    todo = await todo_collection.insert_one(todo_data)
-    new_todo = await todo_collection.find_one({
-        "_id": todo.inserted_id
+    user = await user_collection.find_one({
+        "_id": ObjectId(todo_data["user_id"])
     })
-    return todo_helper(new_todo)
+    if user:
+        todo = await todo_collection.insert_one(todo_data)
+        new_todo = await todo_collection.find_one({
+            "_id": todo.inserted_id
+        })
+        return todo_helper(new_todo)
+    return False
 
 
 # Retrieve a todo with a matching ID

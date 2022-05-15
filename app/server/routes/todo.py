@@ -23,11 +23,14 @@ from server.models.responce import (
 router = APIRouter()
 
 
-@router.post("/", response_description="Todo data added into the database")
+@router.post("/add", response_description="Todo data added into the database")
 async def add_todo_data(todo: ToDoSchema = Body(...)):
     todo = jsonable_encoder(todo)
     new_todo = await add_todo(todo)
-    return ResponseModel(new_todo, "Todo added successfully.")
+    if new_todo:
+        return ResponseModel(new_todo, "Todo data added successfully.")
+    return ErrorResponseModel(
+        "An error occurred.", 404, "User does not exist.")
 
 
 @router.get("/user/{user_id}", response_description="Todos retrieved")

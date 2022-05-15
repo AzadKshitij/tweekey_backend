@@ -1,27 +1,11 @@
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
 from passlib.hash import sha512_crypt
+from server.models.responce import ErrorResponseModel, ResponseModel
+from server.models.user import UpdateUserModel, UserLoginSchema, UserSchema
 
-
-from ..database.user import (
-    add_user,
-    delete_user,
-    retrieve_user,
-    retrieve_users,
-    update_user,
-)
-
-from server.models.user import (
-    UserSchema,
-    UserLoginSchema,
-    UpdateUserModel,
-
-)
-
-from server.models.responce import (
-    ErrorResponseModel,
-    ResponseModel,
-)
+from ..database.user import (add_user, delete_user, retrieve_user,
+                             retrieve_users, update_user)
 
 router = APIRouter()
 
@@ -91,13 +75,13 @@ async def get_user_data(email):
 # Update a user
 
 
-@router.put("/{email}", response_description="User data updated")
-async def update_user_data(email: str, req: UpdateUserModel = Body(...)):
+@router.put("/{id}", response_description="User data updated")
+async def update_user_data(id: str, req: UpdateUserModel = Body(...)):
     req = {k: v for k, v in req.dict().items() if v is not None}
-    updated_user = await update_user(email, req)
+    updated_user = await update_user(id, req)
     if updated_user:
         return ResponseModel(
-            "User with email: {} update is successful".format(email),
+            "User with id: {} update is successful".format(id),
             "User name updated successfully",
         )
     return ErrorResponseModel(
@@ -106,18 +90,19 @@ async def update_user_data(email: str, req: UpdateUserModel = Body(...)):
         "There was an error updating the user data.",
     )
 
+
 # Delete a user
 
 
-@router.delete("/{email}", response_description="User deleted")
-async def delete_user_data(email: str):
-    deleted_user = await delete_user(email)
+@router.delete("/{id}", response_description="User deleted")
+async def delete_user_data(id: str):
+    deleted_user = await delete_user(id)
     if deleted_user:
         return ResponseModel(
-            "User with email: {} removed".format(
-                email), "User deleted successfully"
+            "User with id: {} removed".format(
+                id), "User deleted successfully"
         )
     return ErrorResponseModel(
-        "An error occurred", 404, "User with email {0} doesn't exist".format(
-            email)
+        "An error occurred", 404, "User with id {0} doesn't exist".format(
+            id)
     )
